@@ -4,8 +4,6 @@
       <div class="logo-section">
         <h1>LDP MERCHANDISING</h1>
       </div>
-
-      <h2>Bienvenido</h2>
       <p class="subtitle">Inicia sesión</p>
 
       <form @submit.prevent="handleLogin">
@@ -57,7 +55,7 @@
       </form>
 
       <div class="signup-section">
-        <p>No tiene una cuenta? <router-link to="/register">Registrarse</router-link></p>
+        <p>No tienes una cuenta? <router-link to="/register">Registrarse</router-link></p>
       </div>
     </div>
   </div>
@@ -130,13 +128,6 @@ const handleLogin = async () => {
   font-size: 28px;
   font-weight: 700;
   color: #1f2937;
-}
-
-h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0px;
 }
 
 .subtitle {
