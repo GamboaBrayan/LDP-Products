@@ -267,7 +267,6 @@ const addProduct = async () => {
     // Reset form
     newProduct.value = {
       name: '',
-      sku: '',
       category: '',
       unit_price: 0,
       quantity: 1,
@@ -309,13 +308,13 @@ const resetQuantity = async (id) => {
     const product = products.value.find(p => p.id === id)
     if (product) product.quantity = 1
   } catch (error) {
-    console.error('Error resetting quantity:', error)
-    alert('Error resetting quantity: ' + error.message)
+    console.error('Error reseteando cantidad:', error)
+    alert('Error reseteando cantidad: ' + error.message)
   }
 }
 
 const deleteProduct = async (id) => {
-  if (!confirm('Are you sure you want to delete this product?')) return
+  if (!confirm('Estas seguro que quieres borrar este producto?')) return
   
   try {
     const { error } = await supabase
@@ -327,7 +326,7 @@ const deleteProduct = async (id) => {
     
     products.value = products.value.filter(p => p.id !== id)
   } catch (error) {
-    console.error('Error deleting product:', error)
+    console.error('Error eliminando producto:', error)
   }
 }
 
