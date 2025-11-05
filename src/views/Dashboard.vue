@@ -65,8 +65,12 @@
                   </td>
                   <td class="total-price">${{ (product.unit_price * product.quantity).toFixed(2) }}</td>
                   <td class="actions-cell">
-                    <button @click="resetQuantity(product.id)" class="reset-btn">Reset</button>
-                    <button @click="deleteProduct(product.id)" class="delete-btn">Borrar</button>
+                    <button @click="resetQuantity(product.id)" class="reset-btn" title="Resetear cantidad a 1">
+                      <RefreshCw :size="16" />
+                    </button>
+                    <button @click="deleteProduct(product.id)" class="delete-btn" title="Borrar producto">
+                      <Trash2 :size="16" />
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -129,7 +133,7 @@
           <div class="form-group">
             <label>Categoria</label>
             <select v-model="newProduct.category" required>
-              <option value="">Select category</option>
+              <option value="">Seleccionar Categoria</option>
               <option value="Impresiones">Impresiones</option>
               <option value="Empastado">Empastado</option>
               <option value="Lapiceros">Lapiceros</option>
@@ -158,6 +162,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar.vue'
+import { RefreshCw, Trash2 } from 'lucide-vue-next'
 
 const router = useRouter()
 const products = ref([])
@@ -492,24 +497,32 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.delete-btn:hover {
-  background: #dc2626;
+.delete-btn svg {
+  flex-shrink: 0;
 }
 
 .reset-btn {
-  background: #f59e0b; /* amber */
+  background: #60a5fa; /* light blue */
   color: white;
   border: none;
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reset-btn svg {
+  flex-shrink: 0;
 }
 
 .reset-btn:hover {
-  background: #d97706;
-} 
+  background: #93c5fd;
+}
+
 .actions-cell {
   display: flex;
   gap: 8px;
