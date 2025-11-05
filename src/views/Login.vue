@@ -4,7 +4,7 @@
       <div class="logo-section">
         <h1>LDP MERCHANDISING</h1>
       </div>
-      <p class="subtitle">Inicia sesión</p>
+      <h2 class="subtitle">Inicia sesión</h2>
 
       <form @submit.prevent="handleLogin">
         <div class="form-group">
@@ -128,6 +128,13 @@ const handleLogin = async () => {
   font-size: 28px;
   font-weight: 700;
   color: #1f2937;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0px;
 }
 
 .subtitle {
