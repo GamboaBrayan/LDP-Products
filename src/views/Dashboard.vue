@@ -68,13 +68,25 @@
                     <button @click="resetQuantity(product.id)" class="reset-btn" title="Resetear cantidad a 1">
                       <RefreshCw :size="16" />
                     </button>
-                    <button @click="deleteProduct(product.id)" class="delete-btn" title="Borrar producto">
+                      <button @click="openDeleteModal(product)" class="delete-btn" title="Borrar producto">
                       <Trash2 :size="16" />
                     </button>
                   </td>
                 </tr>
               </tbody>
             </table>
+
+              <!-- Delete confirmation modal -->
+              <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+                <div class="modal" @click.stop>
+                  <h2>Confirmar eliminación</h2>
+                  <p>¿Estás seguro que deseas borrar el producto <strong>{{ productToDelete?.name }}</strong>?</p>
+                  <div class="modal-buttons">
+                    <button type="button" class="cancel-btn" @click="closeDeleteModal">Cancelar</button>
+                    <button type="button" class="delete-btn" @click="performDelete" :disabled="deleting">{{ deleting ? 'Eliminando...' : 'Borrar Producto' }}</button>
+                  </div>
+                </div>
+              </div>
 
             <div class="pagination">
               <span>Mostrando {{ startIndex }} - {{ endIndex }} of {{ filteredProducts.length }}</span>
@@ -313,20 +325,39 @@ const resetQuantity = async (id) => {
   }
 }
 
-const deleteProduct = async (id) => {
-  if (!confirm('Estas seguro que quieres borrar este producto?')) return
-  
+const showDeleteModal = ref(false)
+const productToDelete = ref(null)
+const deleting = ref(false)
+
+const openDeleteModal = (product) => {
+  productToDelete.value = product
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  productToDelete.value = null
+}
+
+const performDelete = async () => {
+  if (!productToDelete.value) return
+  const id = productToDelete.value.id
   try {
+    deleting.value = true
     const { error } = await supabase
       .from('products')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
-    
+
     products.value = products.value.filter(p => p.id !== id)
+    closeDeleteModal()
   } catch (error) {
     console.error('Error eliminando producto:', error)
+    alert('Error eliminando producto: ' + (error.message || error))
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -335,7 +366,7 @@ const handleLogout = async () => {
   router.push('/login')
 }
 
-// When filters/search or product list change, reset or clamp current page
+
 watch([searchQuery, filterCategory, filterStatus, () => products.value.length], () => {
   if (currentPage.value > totalPages.value) currentPage.value = totalPages.value || 1
   if (currentPage.value < 1) currentPage.value = 1
@@ -725,5 +756,37 @@ onMounted(() => {
 
 .submit-btn:hover {
   background: #2563eb;
+}
+
+/* Responsive modal tweaks */
+.modal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .modal {
+    padding: 18px;
+    width: calc(100% - 32px);
+    border-radius: 10px;
+  }
+
+  .modal h2 {
+    font-size: 20px;
+  }
+
+  .modal p {
+    font-size: 14px;
+  }
+
+  .modal-buttons {
+    flex-direction: column-reverse; /* primary action on bottom */
+    gap: 12px;
+  }
+
+  .modal-buttons .cancel-btn,
+  .modal-buttons .delete-btn {
+    width: 100%;
+  }
 }
 </style>

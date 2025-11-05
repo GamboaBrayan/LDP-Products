@@ -43,13 +43,25 @@
           <button 
             v-if="profile.avatar_url" 
             class="remove-avatar-btn"
-            @click="removeAvatar"
+            @click="openAvatarDeleteModal"
             :disabled="uploadingAvatar"
           >
             Remove Photo
           </button>
           
           <p class="avatar-hint">JPG, PNG or GIF. Max 2MB</p>
+
+          <!-- Delete avatar confirmation modal -->
+          <div v-if="showAvatarDeleteModal" class="modal-overlay" @click="closeAvatarDeleteModal">
+            <div class="modal" @click.stop>
+              <h2>Confirmar eliminación</h2>
+              <p>¿Estás seguro que deseas borrar tu foto de perfil?</p>
+              <div class="modal-buttons">
+                <button type="button" class="cancel-btn" @click="closeAvatarDeleteModal">Cancelar</button>
+                <button type="button" class="delete-btn" @click="performRemoveAvatar" :disabled="deletingAvatar">{{ deletingAvatar ? 'Eliminando...' : 'Borrar Foto' }}</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Profile Form -->
@@ -445,64 +457,81 @@ const uploadAvatar = async (file) => {
  * Función para eliminar el avatar.
  * Extrae la ruta del archivo de la URL pública y usa .remove().
  */
-const removeAvatar = async () => {
-  if (!confirm('Estas seguro de querer borrar la foto?')) return
+// Avatar delete modal flow
+const showAvatarDeleteModal = ref(false)
+const deletingAvatar = ref(false)
 
-  try {
-    uploadingAvatar.value = true
-    errorMessage.value = ''
+const openAvatarDeleteModal = () => {
+  showAvatarDeleteModal.value = true
+}
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No user found')
+const closeAvatarDeleteModal = () => {
+  showAvatarDeleteModal.value = false
+}
 
-    if (profile.value.avatar_url) {
-        // 1. Limpiar la URL de cualquier timestamp (?t=...)
-        let avatarUrl = profile.value.avatar_url;
-        const hasQuery = avatarUrl.indexOf('?');
-        if (hasQuery !== -1) {
-            avatarUrl = avatarUrl.substring(0, hasQuery);
-        }
+const performRemoveAvatar = async () => {
+  try {
+    deletingAvatar.value = true
+    uploadingAvatar.value = true
+    errorMessage.value = ''
 
-        const pathIndex = avatarUrl.indexOf('avatar/') 
-        
-        if (pathIndex !== -1) {
-            // Extraer la ruta relativa para el comando .remove()
-            const filePathToRemove = avatarUrl.substring(pathIndex + 8) 
-            
-            const { error: deleteError } = await supabase.storage
-                .from('avatar') // Nombre del bucket consistente
-                .remove([filePathToRemove])
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('No user found')
 
-            if (deleteError) console.error('Error deleting file:', deleteError)
-        } else {
-            console.error('No se pudo determinar la ruta de archivo para eliminar.')
-        }
-    }
+    if (profile.value.avatar_url) {
+      // 1. Limpiar la URL de cualquier timestamp (?t=...)
+      let avatarUrl = profile.value.avatar_url;
+      const hasQuery = avatarUrl.indexOf('?');
+      if (hasQuery !== -1) {
+        avatarUrl = avatarUrl.substring(0, hasQuery);
+      }
 
-    // Actualizar perfil en la DB
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ 
-        avatar_url: null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user.id)
+      const pathIndex = avatarUrl.indexOf('avatar/')
+      if (pathIndex !== -1) {
+        const filePathToRemove = avatarUrl.substring(pathIndex + 8)
+        const { error: deleteError } = await supabase.storage
+          .from('avatar')
+          .remove([filePathToRemove])
+        if (deleteError) console.error('Error deleting file:', deleteError)
+      } else {
+        console.error('No se pudo determinar la ruta de archivo para eliminar.')
+      }
+    }
 
-    if (updateError) throw updateError
+    // Actualizar perfil en la DB
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ 
+        avatar_url: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id)
 
-    profile.value.avatar_url = ''
-    successMessage.value = 'La foto de perfil ha sido eliminada!'
+    if (updateError) throw updateError
 
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
+    profile.value.avatar_url = ''
+    successMessage.value = 'La foto de perfil ha sido eliminada!'
 
-  } catch (error) {
-    console.error('Error removing avatar:', error)
-    errorMessage.value = 'Error removing photo: ' + (error.message || 'Error desconocido')
-  } finally {
-    uploadingAvatar.value = false
-  }
+    // Notify Navbar
+    try {
+      window.dispatchEvent(new CustomEvent('profile:avatar-updated', { detail: { avatar_url: '' } }))
+    } catch (e) {
+      console.warn('Could not dispatch avatar remove event', e)
+    }
+
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 3000)
+
+    closeAvatarDeleteModal()
+
+  } catch (error) {
+    console.error('Error removing avatar:', error)
+    errorMessage.value = 'Error removing photo: ' + (error.message || 'Error desconocido')
+  } finally {
+    uploadingAvatar.value = false
+    deletingAvatar.value = false
+  }
 }
 
 const formatDate = (dateString) => {
@@ -831,5 +860,72 @@ small {
   .form-row {
     grid-template-columns: 1fr;
   }
+}
+
+/* Modal styles (copied from Dashboard for consistent look & responsiveness) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.modal h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.modal p {
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cancel-btn,
+.submit-btn,
+.delete-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.cancel-btn { background: #f3f4f6; color: #374151 }
+.delete-btn { background: #ef4444; color: white }
+
+/* Responsive modal tweaks */
+.modal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .modal { padding: 18px; width: calc(100% - 32px); border-radius: 10px }
+  .modal h2 { font-size: 20px }
+  .modal p { font-size: 14px }
+  .modal-buttons { flex-direction: column-reverse; gap: 12px }
+  .modal-buttons .cancel-btn, .modal-buttons .delete-btn { width: 100% }
 }
 </style>
