@@ -16,7 +16,8 @@
         <div class="user-menu">
           <button class="user-button" @click="showMenu = !showMenu">
             <div class="avatar">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar" />
+              <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="8" r="4" fill="#3b82f6"/>
                 <path d="M4 20c0-4 3-6 8-6s8 2 8 6" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -35,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '../lib/supabase'
 
 defineEmits(['logout'])
@@ -62,8 +63,19 @@ const loadUserAvatar = async () => {
   }
 }
 
+const onAvatarUpdated = (e) => {
+  if (e?.detail && typeof e.detail.avatar_url !== 'undefined') {
+    avatarUrl.value = e.detail.avatar_url || ''
+  }
+}
+
 onMounted(() => {
   loadUserAvatar()
+  window.addEventListener('profile:avatar-updated', onAvatarUpdated)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('profile:avatar-updated', onAvatarUpdated)
 })
 </script>
 
@@ -158,6 +170,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .dropdown-menu {

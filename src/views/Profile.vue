@@ -232,267 +232,296 @@ const passwordSuccess = ref('')
 const fileInput = ref(null)
 
 const profile = ref({
-  id: '',
-  email: '',
-  full_name: '',
-  username: '',
-  avatar_url: '',
-  phone: '',
-  company: '',
-  address: '',
-  city: '',
-  country: '',
-  created_at: '',
-  updated_at: ''
+  id: '',
+  email: '',
+  full_name: '',
+  username: '',
+  avatar_url: '',
+  phone: '',
+  company: '',
+  address: '',
+  city: '',
+  country: '',
+  created_at: '',
+  updated_at: ''
 })
 
 const passwordData = ref({
-  newPassword: '',
-  confirmPassword: ''
+  newPassword: '',
+  confirmPassword: ''
 })
 
 const loadProfile = async () => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      router.push('/login')
-      return
-    }
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      router.push('/login')
+      return
+    }
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
 
-    if (error) throw error
+    if (error) throw error
 
-    profile.value = {
-      ...data,
-      email: user.email
-    }
-  } catch (error) {
-    console.error('Error cargando perfil:', error)
-    errorMessage.value = 'Error loading profile data'
-  }
+    profile.value = {
+      ...data,
+      email: user.email
+    }
+  } catch (error) {
+    console.error('Error cargando perfil:', error)
+    errorMessage.value = 'Error loading profile data'
+  }
 }
 
 const updateProfile = async () => {
-  try {
-    loading.value = true
-    errorMessage.value = ''
-    successMessage.value = ''
+  try {
+    loading.value = true
+    errorMessage.value = ''
+    successMessage.value = ''
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        full_name: profile.value.full_name,
-        username: profile.value.username,
-        phone: profile.value.phone,
-        company: profile.value.company,
-        address: profile.value.address,
-        city: profile.value.city,
-        country: profile.value.country,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', profile.value.id)
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name: profile.value.full_name,
+        username: profile.value.username,
+        phone: profile.value.phone,
+        company: profile.value.company,
+        address: profile.value.address,
+        city: profile.value.city,
+        country: profile.value.country,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', profile.value.id)
 
-    if (error) throw error
+    if (error) throw error
 
-    successMessage.value = 'Perfil actualizado con éxito!'
-    
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
-  } catch (error) {
-    errorMessage.value = error.message
-  } finally {
-    loading.value = false
-  }
+    successMessage.value = 'Perfil actualizado con éxito!'
+    
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 3000)
+  } catch (error) {
+    errorMessage.value = error.message
+  } finally {
+    loading.value = false
+  }
 }
 
 const updatePassword = async () => {
-  try {
-    loadingPassword.value = true
-    passwordError.value = ''
-    passwordSuccess.value = ''
+  try {
+    loadingPassword.value = true
+    passwordError.value = ''
+    passwordSuccess.value = ''
 
-    if (passwordData.value.newPassword !== passwordData.value.confirmPassword) {
-      throw new Error('Las contraseñas no coinciden')
-    }
+    if (passwordData.value.newPassword !== passwordData.value.confirmPassword) {
+      throw new Error('Las contraseñas no coinciden')
+    }
 
-    if (passwordData.value.newPassword.length < 6) {
-      throw new Error('La contraseña debe tener al menos 6 caracteres')
-    }
+    if (passwordData.value.newPassword.length < 6) {
+      throw new Error('La contraseña debe tener al menos 6 caracteres')
+    }
 
-    const { error } = await supabase.auth.updateUser({
-      password: passwordData.value.newPassword
-    })
+    const { error } = await supabase.auth.updateUser({
+      password: passwordData.value.newPassword
+    })
 
-    if (error) throw error
+    if (error) throw error
 
-    passwordSuccess.value = 'La contraseña ha sido actualizada con éxito!'
-    passwordData.value.newPassword = ''
-    passwordData.value.confirmPassword = ''
+    passwordSuccess.value = 'La contraseña ha sido actualizada con éxito!'
+    passwordData.value.newPassword = ''
+    passwordData.value.confirmPassword = ''
 
-    setTimeout(() => {
-      passwordSuccess.value = ''
-    }, 3000)
-  } catch (error) {
-    passwordError.value = error.message
-  } finally {
-    loadingPassword.value = false
-  }
+    setTimeout(() => {
+      passwordSuccess.value = ''
+    }, 3000)
+  } catch (error) {
+    passwordError.value = error.message
+  } finally {
+    loadingPassword.value = false
+  }
 }
 
 const triggerFileInput = () => {
-  fileInput.value.click()
+  fileInput.value.click()
 }
 
 const handleFileSelect = async (event) => {
-  const file = event.target.files[0]
-  if (!file) return
+  const file = event.target.files[0]
+  if (!file) return
 
-  // Validar tipo de archivo
-  if (!file.type.startsWith('image/')) {
-    errorMessage.value = 'Please select an image file'
-    return
-  }
+  // Validar tipo de archivo
+  if (!file.type.startsWith('image/')) {
+    errorMessage.value = 'Please select an image file'
+    return
+  }
 
-  // Validar tamaño (2MB máximo)
-  if (file.size > 2 * 1024 * 1024) {
-    errorMessage.value = 'Image size must be less than 2MB'
-    return
-  }
+  // Validar tamaño (2MB máximo)
+  if (file.size > 2 * 1024 * 1024) {
+    errorMessage.value = 'Image size must be less than 2MB'
+    return
+  }
 
-  await uploadAvatar(file)
+  await uploadAvatar(file)
 }
 
+/**
+ * Función para subir el avatar
+ * 1. Usa un nombre fijo (avatar.jpeg) para la ruta de almacenamiento.
+ * 2. Utiliza upsert: true para sobrescribir la imagen existente.
+ * 3. Añade un timestamp a la URL para forzar la invalidación del caché.
+ */
 const uploadAvatar = async (file) => {
-  try {
-    uploadingAvatar.value = true
-    errorMessage.value = ''
+  try {
+    uploadingAvatar.value = true
+    errorMessage.value = ''
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No user found')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('No se encontró usuario')
 
-    // Crear nombre único para el archivo
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${user.id}/avatar.${fileExt}`
+    // Usar un nombre de archivo FIJO para la ruta. Esto es clave para upsert y RLS.
+    const fileName = 'avatar.jpeg' 
+    const filePath = `${user.id}/${fileName}` 
+    
+    // Validación de tipo (mantenida por buena práctica)
+    const fileExt = file.name.split('.').pop();
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    if (!allowedExtensions.includes(fileExt.toLowerCase())) {
+        throw new Error('Formato de imagen no soportado. Usa JPG, PNG o GIF.');
+    }
 
-    // Eliminar avatar anterior si existe
-    if (profile.value.avatar_url) {
-      const oldPath = profile.value.avatar_url.split('/').pop()
-      await supabase.storage
-        .from('avatars')
-        .remove([`${user.id}/${oldPath}`])
-    }
+    // 2. Subir/Sobreescribir avatar
+    const { error: uploadError } = await supabase.storage
+      .from('avatar') // ¡Debe ser el nombre correcto de tu bucket!
+      .upload(filePath, file, { 
+        cacheControl: '3600',
+        upsert: true // Sobrescribir el archivo existente en esa ruta
+      })
 
-    // Subir nuevo avatar
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(fileName, file, { upsert: true })
+    if (uploadError) throw uploadError
 
-    if (uploadError) throw uploadError
+    // Obtener URL pública
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatar')
+      .getPublicUrl(filePath)
 
-    // Obtener URL pública
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(fileName)
+    // 3. Forzar el caché añadiendo un timestamp a la URL
+    const uniquePublicUrl = `${publicUrl}?t=${new Date().getTime()}`
 
-    // Actualizar perfil con nueva URL
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ 
-        avatar_url: publicUrl,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user.id)
+    // Actualizar perfil con la URL ÚNICA
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ 
+        avatar_url: uniquePublicUrl, 
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id)
 
-    if (updateError) throw updateError
+    if (updateError) throw updateError
 
-    profile.value.avatar_url = publicUrl
-    successMessage.value = 'Foto de perfil actualizada con éxito!'
+    profile.value.avatar_url = uniquePublicUrl 
+    successMessage.value = 'Foto de perfil actualizada con éxito!'
 
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 3000)
 
-  } catch (error) {
-    console.error('Error cargando perfil:', error)
-    errorMessage.value = 'Error cargando foto:' + error.message
-  } finally {
-    uploadingAvatar.value = false
-    if (fileInput.value) {
-      fileInput.value.value = ''
-    }
-  }
+  } catch (error) {
+    console.error('Error cargando perfil:', error)
+    errorMessage.value = 'Error cargando foto: ' + (error.message || 'Error desconocido')
+  } finally {
+    uploadingAvatar.value = false
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
 }
 
+/**
+ * Función para eliminar el avatar.
+ * Extrae la ruta del archivo de la URL pública y usa .remove().
+ */
 const removeAvatar = async () => {
-  if (!confirm('Estas seguro de querer borrar la foto?')) return
+  if (!confirm('Estas seguro de querer borrar la foto?')) return
 
-  try {
-    uploadingAvatar.value = true
-    errorMessage.value = ''
+  try {
+    uploadingAvatar.value = true
+    errorMessage.value = ''
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('No user found')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('No user found')
 
-    // Eliminar archivo del storage
-    if (profile.value.avatar_url) {
-      const fileName = profile.value.avatar_url.split('/').pop()
-      const { error: deleteError } = await supabase.storage
-        .from('avatars')
-        .remove([`${user.id}/${fileName}`])
+    if (profile.value.avatar_url) {
+        // 1. Limpiar la URL de cualquier timestamp (?t=...)
+        let avatarUrl = profile.value.avatar_url;
+        const hasQuery = avatarUrl.indexOf('?');
+        if (hasQuery !== -1) {
+            avatarUrl = avatarUrl.substring(0, hasQuery);
+        }
 
-      if (deleteError) console.error('Error deleting file:', deleteError)
-    }
+        const pathIndex = avatarUrl.indexOf('avatar/') 
+        
+        if (pathIndex !== -1) {
+            // Extraer la ruta relativa para el comando .remove()
+            const filePathToRemove = avatarUrl.substring(pathIndex + 8) 
+            
+            const { error: deleteError } = await supabase.storage
+                .from('avatar') // Nombre del bucket consistente
+                .remove([filePathToRemove])
 
-    // Actualizar perfil
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ 
-        avatar_url: null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user.id)
+            if (deleteError) console.error('Error deleting file:', deleteError)
+        } else {
+            console.error('No se pudo determinar la ruta de archivo para eliminar.')
+        }
+    }
 
-    if (updateError) throw updateError
+    // Actualizar perfil en la DB
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ 
+        avatar_url: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id)
 
-    profile.value.avatar_url = ''
-    successMessage.value = 'La foto de perfil ha sido eliminada!'
+    if (updateError) throw updateError
 
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
+    profile.value.avatar_url = ''
+    successMessage.value = 'La foto de perfil ha sido eliminada!'
 
-  } catch (error) {
-    console.error('Error removing avatar:', error)
-    errorMessage.value = 'Error removing photo: ' + error.message
-  } finally {
-    uploadingAvatar.value = false
-  }
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 3000)
+
+  } catch (error) {
+    console.error('Error removing avatar:', error)
+    errorMessage.value = 'Error removing photo: ' + (error.message || 'Error desconocido')
+  } finally {
+    uploadingAvatar.value = false
+  }
 }
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  })
+  if (!dateString) return 'N/A'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })
 }
 
 const handleLogout = async () => {
-  await supabase.auth.signOut()
-  router.push('/login')
+  await supabase.auth.signOut()
+  router.push('/login')
 }
 
 onMounted(() => {
-  loadProfile()
+  loadProfile()
 })
 </script>
 
