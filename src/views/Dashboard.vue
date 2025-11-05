@@ -451,6 +451,11 @@ onMounted(() => {
   border-collapse: collapse;
 }
 
+/* make table horizontally scrollable on small screens */
+.table-container {
+  overflow-x: auto;
+}
+
 .products-table th {
   text-align: left;
   padding: 16px;
@@ -484,6 +489,47 @@ onMounted(() => {
   border: 2px solid #e5e7eb;
   border-radius: 6px;
   text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .container { padding: 16px }
+  .header h1 { font-size: 24px }
+  .table-title { font-size: 18px }
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    order: 2;
+    width: 100%;
+  }
+  .main-content {
+    order: 1;
+    padding: 16px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .add-button {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+  .search-box input {
+    padding: 10px 12px 10px 40px;
+    font-size: 14px;
+  }
+  .products-table th,
+  .products-table td { padding: 12px 8px }
+  .quantity-input { width: 64px }
+  .pagination { flex-direction: column; align-items: flex-start; gap: 12px }
+  .pagination-buttons { flex-wrap: wrap }
+  .mobile-hide-on-small { display: none }
 }
 
 .delete-btn {

@@ -9,7 +9,7 @@
       </div>
 
       <div class="navbar-center">
-        <router-link to="/dashboard" class="nav-link">Dashboard</router-link>
+        <router-link to="/dashboard" class="nav-link">Inicio</router-link>
       </div>
 
       <div class="navbar-right">
@@ -32,6 +32,7 @@
         </div>
       </div>
     </div>
+
   </nav>
 </template>
 
@@ -130,6 +131,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+/* responsive rules */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 20px;
+  }
+  .navbar-content { height: 64px }
 }
 
 .icon-button {
