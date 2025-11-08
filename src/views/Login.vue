@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-card">
       <div class="logo-section">
-        <h1>LDP MERCHANDISING</h1>
+        <h1>RP Decor' Art E.I.R.L</h1>
       </div>
       <h2 class="subtitle">Inicia sesión</h2>
 
@@ -12,7 +12,7 @@
           <input 
             type="email" 
             v-model="email" 
-            placeholder="Enter your email"
+            placeholder="Ingresa tu correo"
             required
           />
         </div>
@@ -22,7 +22,7 @@
           <input 
             :type="showPassword ? 'text' : 'password'" 
             v-model="password" 
-            placeholder="Enter your password"
+            placeholder="Ingresa tu contraseña"
             required
           />
           <button

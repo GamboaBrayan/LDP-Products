@@ -57,7 +57,7 @@
               <h2>Confirmar eliminación</h2>
               <p>¿Estás seguro que deseas borrar tu foto de perfil?</p>
               <div class="modal-buttons">
-                <button type="button" class="cancel-btn" @click="closeAvatarDeleteModal">Cancelar</button>
+                <button type="button" class="cancel-btn" @click="closeAvatarDeleteModal"></button>Cancelar
                 <button type="button" class="delete-btn" @click="performRemoveAvatar" :disabled="deletingAvatar">{{ deletingAvatar ? 'Eliminando...' : 'Borrar Foto' }}</button>
               </div>
             </div>
@@ -164,8 +164,7 @@
             </div>
 
             <div class="form-actions">
-              <button type="button" @click="loadProfile" class="cancel-btn">Cancelar</button>
-              <button type="submit" class="save-btn" :disabled="loading">
+              <button type="submit" class="save-btn btn-standard" :disabled="loading">
                 {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
               </button>
             </div>
@@ -203,7 +202,7 @@
                 {{ passwordSuccess }}
               </div>
 
-              <button type="submit" class="save-btn" :disabled="loadingPassword">
+              <button type="submit" class="save-btn btn-standard" :disabled="loadingPassword">
                 {{ loadingPassword ? 'Actualizando...' : 'Actualizar Contraseña' }}
               </button>
             </form>
@@ -773,19 +772,46 @@ small {
 
 .form-actions {
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+  gap: 16px;
+  justify-content: center; /* center actions with equal space on both sides */
+  align-items: center;
   padding-bottom: 16px;
 }
 
-.cancel-btn,
-.save-btn {
-  padding: 12px 32px;
+.form-actions .cancel-btn,
+.form-actions .save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 44px;
+  flex: 0 0 140px;
+  padding: 0 16px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: all 0.2s;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Boton estandar reusable .form-actions */
+.btn-standard {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 44px;
+  flex: 0 0 140px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .cancel-btn {
@@ -859,6 +885,27 @@ small {
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive actions: stack buttons and make full width on small screens */
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .form-actions .cancel-btn,
+  .form-actions .save-btn {
+    width: 100%;
+    padding: 12px 16px;
+  }
+
+  /* Make standard buttons full width on small screens too */
+  .btn-standard {
+    width: 100%;
+    padding: 12px 16px;
   }
 }
 

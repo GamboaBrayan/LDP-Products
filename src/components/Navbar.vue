@@ -4,7 +4,7 @@
       <div class="navbar-left">
         <div class="logo">
             <img src="/logo.jpg" alt="LDP MERCHANDISING Logo" width="40" height="40" />
-          <span>RPDecort</span>
+          <span>RP Decor' Art E.I.R.L</span>
         </div>
       </div>
 
