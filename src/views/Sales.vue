@@ -397,9 +397,10 @@ onMounted(() => {
 }
 
 .container {
-  max-width: 1400px;
+  width: 100%;
+  max-width: var(--max-content-width);
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--container-padding);
 }
 
 .header {
