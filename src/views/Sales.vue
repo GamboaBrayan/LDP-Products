@@ -85,7 +85,7 @@
                         <path d="M11.333 2A2.827 2.827 0 0 1 14 4.667L5.5 13.167l-4.167.833.833-4.167L11.333 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
                     </button>
-                    <button @click="deleteSale(sale.id)" class="delete-btn" title="Eliminar">
+                    <button @click="openDeleteModal(sale)" class="delete-btn" title="Eliminar">
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <path d="M2 4h12M5.333 4V2.667a1.333 1.333 0 0 1 1.334-1.334h2.666a1.333 1.333 0 0 1 1.334 1.334V4m2 0v9.333a1.333 1.333 0 0 1-1.334 1.334H4.667a1.333 1.333 0 0 1-1.334-1.334V4h9.334z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
@@ -98,6 +98,42 @@
 
           <div class="pagination">
             <span>Mostrando {{ filteredSales.length }} de {{ sales.length }} ventas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h2>Confirmar Eliminación</h2>
+          <button class="close-btn" @click="closeDeleteModal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <p class="confirmation-message">
+            ¿Estás seguro que deseas eliminar la venta de <strong>{{ saleToDelete?.customer_name }}</strong>?
+          </p>
+          <p class="sale-details">
+            <span class="detail-label">Fecha:</span> {{ saleToDelete ? formatDate(saleToDelete.created_at) : '' }}<br>
+            <span class="detail-label">Monto:</span> S/. {{ saleToDelete?.price.toFixed(2) }}
+          </p>
+          
+          <div class="modal-buttons">
+            <button type="button" @click="closeDeleteModal" class="cancel-btn">Cancelar</button>
+            <button 
+              type="button" 
+              class="delete-confirm-btn" 
+              :disabled="deleting"
+              @click="confirmDelete"
+            >
+              {{ deleting ? 'Eliminando...' : 'Eliminar Venta' }}
+            </button>
           </div>
         </div>
       </div>
@@ -179,6 +215,9 @@ const filterDate = ref('')
 const showAddModal = ref(false)
 const loading = ref(false)
 const errorMessage = ref('')
+const showDeleteModal = ref(false)
+const saleToDelete = ref(null)
+const deleting = ref(false)
 const editingId = ref(null)
 
 const newSale = ref({
@@ -282,21 +321,36 @@ const editSale = (sale) => {
   showAddModal.value = true
 }
 
-const deleteSale = async (id) => {
-  if (!confirm('¿Estás seguro de eliminar esta venta?')) return
+const openDeleteModal = (sale) => {
+  saleToDelete.value = sale
+  showDeleteModal.value = true
+}
 
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  saleToDelete.value = null
+  deleting.value = false
+}
+
+const confirmDelete = async () => {
+  if (!saleToDelete.value) return
+  
   try {
+    deleting.value = true
     const { error } = await supabase
       .from('sales')
       .delete()
-      .eq('id', id)
+      .eq('id', saleToDelete.value.id)
 
     if (error) throw error
 
-    sales.value = sales.value.filter(s => s.id !== id)
+    sales.value = sales.value.filter(s => s.id !== saleToDelete.value.id)
+    closeDeleteModal()
   } catch (error) {
     console.error('Error deleting sale:', error)
-    alert('Error al eliminar la venta')
+    alert('Error al eliminar la venta: ' + error.message)
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -700,6 +754,54 @@ onMounted(() => {
 
 .price-input input {
   padding-left: 36px;
+}
+
+/* Delete confirmation modal styles */
+.modal-content {
+  padding: 24px;
+}
+
+.confirmation-message {
+  color: #1f2937;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.sale-details {
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #374151;
+  margin-right: 8px;
+}
+
+.delete-confirm-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+  background: #ef4444;
+  color: white;
+}
+
+.delete-confirm-btn:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.delete-confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .error-message {

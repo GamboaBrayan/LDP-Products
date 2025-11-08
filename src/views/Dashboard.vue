@@ -9,7 +9,7 @@
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Añadir nuevo Producto
+          Agregar Producto
         </button>
       </div>
 
@@ -82,8 +82,8 @@
                   <h2>Confirmar eliminación</h2>
                   <p>¿Estás seguro que deseas borrar el producto <strong>{{ productToDelete?.name }}</strong>?</p>
                   <div class="modal-buttons">
-                    <button type="button" class="cancel-btn" @click="closeDeleteModal">Cancelar</button>
-                    <button type="button" class="delete-btn" @click="performDelete" :disabled="deleting">{{ deleting ? 'Eliminando...' : 'Borrar Producto' }}</button>
+                    <button type="button" class="cancel-btn" @click="closeDeleteModal">Cancelar</button>  
+                    <button type="button" class="delete-btn" @click="performDelete" :disabled="deleting">{{ deleting ? 'Eliminando...' : 'Eliminar Producto' }}</button>
                   </div>
                 </div>
               </div>
@@ -406,7 +406,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #3b82f6;
+  background: #10b981;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -418,7 +418,7 @@ onMounted(() => {
 }
 
 .add-button:hover {
-  background: #2563eb;
+  background: #059669;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
@@ -482,7 +482,7 @@ onMounted(() => {
   border-collapse: collapse;
 }
 
-/* make table horizontally scrollable on small screens */
+/* tabla scrolleable de forma horizontal*/
 .table-container {
   overflow-x: auto;
 }
@@ -522,7 +522,7 @@ onMounted(() => {
   text-align: center;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 1024px) {
   .container { padding: 16px }
   .header h1 { font-size: 24px }
@@ -578,7 +578,7 @@ onMounted(() => {
 }
 
 .reset-btn {
-  background: #60a5fa; /* light blue */
+  background: #60a5fa;
   color: white;
   border: none;
   padding: 6px 10px;
@@ -735,18 +735,27 @@ onMounted(() => {
 }
 
 .cancel-btn,
-.submit-btn {
+.submit-btn,
+.modal-buttons .delete-btn {
   flex: 1;
-  padding: 12px;
+  min-width: 120px;
+  padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   border: none;
+  text-align: center;
+  transition: background-color 0.2s ease;
 }
 
 .cancel-btn {
   background: #f3f4f6;
   color: #374151;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
 }
 
 .submit-btn {
@@ -758,7 +767,21 @@ onMounted(() => {
   background: #2563eb;
 }
 
-/* Responsive modal tweaks */
+.modal-buttons .delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.modal-buttons .delete-btn:hover {
+  background: #dc2626;
+}
+
+.modal-buttons .delete-btn:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}
+
+/* Responsive modal */
 .modal {
   max-height: 90vh;
   overflow-y: auto;

@@ -9,7 +9,7 @@
       </div>
 
       <div class="navbar-center">
-        <router-link to="/dashboard" class="nav-link">Inicio</router-link>
+        <router-link to="/dashboard" class="nav-link">Productos</router-link>
         <router-link to="/sales" class="nav-link">Ventas</router-link>
       </div>
 
