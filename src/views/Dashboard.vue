@@ -53,7 +53,7 @@
               <tbody>
                 <tr v-for="product in paginatedProducts" :key="product.id">
                   <td class="product-name">{{ product.name }}</td>
-                  <td>${{ product.unit_price.toFixed(2) }}</td>
+                  <td>S/. {{ product.unit_price.toFixed(2) }}</td>
                   <td>
                     <input 
                       type="number" 
@@ -63,7 +63,7 @@
                       min="1"
                     />
                   </td>
-                  <td class="total-price">${{ (product.unit_price * product.quantity).toFixed(2) }}</td>
+                  <td class="total-price">S/. {{ (product.unit_price * product.quantity).toFixed(2) }}</td>
                   <td class="actions-cell">
                     <button @click="resetQuantity(product.id)" class="reset-btn" title="Resetear cantidad a 1">
                       <RefreshCw :size="16" />

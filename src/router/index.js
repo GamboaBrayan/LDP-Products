@@ -5,6 +5,7 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Profile from '../views/Profile.vue'
+import Sales from '../views/Sales.vue'
 
 const routes = [
   {
@@ -33,6 +34,12 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/sales',
+    name: 'Sales',
+    component: Sales,
     meta: { requiresAuth: true }
   }
 ]

@@ -4,12 +4,13 @@
       <div class="navbar-left">
         <div class="logo">
             <img src="/logo.jpg" alt="LDP MERCHANDISING Logo" width="40" height="40" />
-          <span>LDP MERCHANDISING</span>
+          <span>RPDecort</span>
         </div>
       </div>
 
       <div class="navbar-center">
         <router-link to="/dashboard" class="nav-link">Inicio</router-link>
+        <router-link to="/sales" class="nav-link">Ventas</router-link>
       </div>
 
       <div class="navbar-right">
@@ -26,6 +27,8 @@
           
           <div v-if="showMenu" class="dropdown-menu">
             <router-link to="/profile" class="menu-item">Perfíl</router-link>
+            <router-link to="/dashboard" class="menu-item mobile-only">Inicio</router-link>
+            <router-link to="/sales" class="menu-item mobile-only">Ventas</router-link>
             <div class="menu-divider"></div>
             <a href="#" @click.prevent="$emit('logout')" class="menu-item">Cerrar Sesión</a>
           </div>
@@ -84,7 +87,8 @@ onUnmounted(() => {
 .navbar {
   background: white;
   border-bottom: 1px solid #e5e7eb;
-  padding: 0 118px;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .navbar-content {
@@ -94,6 +98,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   height: 70px;
+  padding: 0 24px;
 }
 
 .navbar-left {
@@ -113,6 +118,8 @@ onUnmounted(() => {
 .navbar-center {
   display: flex;
   gap: 32px;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .nav-link {
@@ -134,11 +141,23 @@ onUnmounted(() => {
 }
 
 /* responsive rules */
+@media (max-width: 1024px) {
+  .navbar-content { padding: 0 18px }
+}
+
 @media (max-width: 768px) {
-  .navbar {
-    padding: 0 20px;
+  .navbar-content { padding: 0 14px; height: 64px }
+
+  .navbar-center {
+    gap: 12px;
+    flex-wrap: wrap;
   }
-  .navbar-content { height: 64px }
+
+  .nav-link {
+    font-size: 14px;
+  }
+
+  .mobile-only { display: block }
 }
 
 .icon-button {
@@ -162,6 +181,16 @@ onUnmounted(() => {
 
 .user-menu {
   position: relative;
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin-left: 12px;
+  color: #6b7280;
 }
 
 .user-button {
@@ -218,4 +247,6 @@ onUnmounted(() => {
   background: #e5e7eb;
   margin: 8px 0;
 }
+
+.mobile-only { display: none }
 </style>
